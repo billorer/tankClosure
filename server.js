@@ -1,5 +1,5 @@
-//var mongojs = require("mongojs");
-var db = null;//mongojs('localhost:27017/myGame', ['account','progress']);
+var mongojs = require("mongojs");
+var db = mongojs('mongodb://root:root@ds143151.mlab.com:43151/tankclosure', ['account']); //mongojs('localhost:27017/myGame', ['account','progress']);
 var assert = require('assert');
 
 var path = require('path');
@@ -729,40 +729,40 @@ var DEBUG = true;
 
 //tries to find a user where the username and password exists
 var isValidPassworrd = function(data, cb){
-	return cb(true,null);
-	// db.account.find({username:data.username,password:data.password}, function(err, res){
-	// 	if(res.length > 0)
-	// 		cb(true, data.username);
-	// 	else
-	// 		cb(false, data.username);
-	// });
+//	return cb(true,null);
+	db.account.find({username:data.username,password:data.password}, function(err, res){
+		if(res.length > 0)
+			cb(true, data.username);
+		else
+			cb(false, data.username);
+	});
 };
 
 //gets a username and checks if it exists
 var isUsernameTaken = function(data, cb){
-	return cb(false);
-	// db.account.find({username:data}, function(err, res){
-	// 	if(res.length > 0)
-	// 		cb(true);
-	// 	else
-	// 		cb(false);
-	// });
+	//return cb(false);
+	db.account.find({username:data}, function(err, res){
+		if(res.length > 0)
+			cb(true);
+		else
+			cb(false);
+	});
 };
 
 var addUser = function(data, cb){
 
-	return cb();
-	// var controlButtons = {
-	// 	forward: 87,
-	// 	backward: 83,
-	// 	left: 65,
-	// 	right: 68,
-	// 	attack: 254
-	// };
-	//
-	// db.account.insert({username:data.username,password:data.password,email:data.email, controlButtons:controlButtons}, function(err){
-	// 	cb();
-	// });
+//	return cb();
+	var controlButtons = {
+		forward: 87,
+		backward: 83,
+		left: 65,
+		right: 68,
+		attack: 1
+	};
+
+	db.account.insert({username:data.username,password:data.password,email:data.email, controlButtons:controlButtons}, function(err){
+		cb();
+	});
 };
 
 var io = require('socket.io')(server, {});
