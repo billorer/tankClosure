@@ -16,7 +16,7 @@
     "consolidate":"^0.14.5"
   },
   "engines": {
-    "node": "4.1.x"
+    "node": "6.9.x"
   },
   "devDependencies": {},
   "scripts": {
