@@ -8,6 +8,8 @@ var express = require('express');
 var formidable = require('formidable');
 var session = require('express-session');
 
+var sha1 = require('sha1');
+
 var fs = require('fs');
 var mv = require('mv');
 //EMAILS
@@ -59,6 +61,8 @@ var sessionMiddleware = session({
   saveUninitialized: true
 });
 
+var sessionArray = [];
+
 app.use(sessionMiddleware);
 
 //starts the server
@@ -89,23 +93,25 @@ app.get('/profile', function(req, res){
 });
 
 app.post('/fileupload', function(req, res){
-  	var form = new formidable.IncomingForm();
-  	form.parse(req, function (err, fields, files) {
-		var oldpath = files.filetoupload.path;
+	if(req.session.user){
+	  	var form = new formidable.IncomingForm();
+	  	form.parse(req, function (err, fields, files) {
+			var oldpath = files.filetoupload.path;
 
-		var str = files.filetoupload.name;
+			var str = files.filetoupload.name;
 
-		var tok = str.split(".");
-		//only jpg allowed
-		if(tok[1] == 'jpg'){
-			var newpath = __dirname + '/client/img/uploads/avatars/' + req.session.user + '.jpg';
-			req.session.avatar = './img/uploads/avatars/' + req.session.user + '.jpg';
-			mv(oldpath, newpath, function(err){
-				if (err) throw err;
-				res.render(__dirname + '/client/views/profile.jade', {user: req.session.user, successfulUpload: true, avatar: req.session.avatar});
-			});
-		}
-	});
+			var tok = str.split(".");
+			//only jpg allowed
+			if(tok[1] == 'jpg'){
+				var newpath = __dirname + '/client/img/uploads/avatars/' + req.session.user + '.jpg';
+				req.session.avatar = './img/uploads/avatars/' + req.session.user + '.jpg';
+				mv(oldpath, newpath, function(err){
+					if (err) throw err;
+					res.render(__dirname + '/client/views/profile.jade', {user: req.session.user, successfulUpload: true, avatar: req.session.avatar});
+				});
+			}
+		});
+	}
 });
 
 app.get('/play', function(req, res){
@@ -120,11 +126,15 @@ app.get('/play', function(req, res){
 		};
 
 		res.render(__dirname + '/client/views/index.jade', {user: req.session.user, controllerCode: req.session.controllerCode, controlButtons:  JSON.stringify(controllerButtons)});
+	}else{
+		res.render(__dirname + '/client/views/login.jade');
 	}
 });
 
 app.route('/logout')
     .get( function( req, res ){
+
+		deleteUserFromSessionArray(req.session.user);
 
         req.session.destroy(function(err){
             if(err){
@@ -136,6 +146,25 @@ app.route('/logout')
             }
         });
     });
+
+/*After a user logs out, its username should be removed from the sessionArray*/
+var deleteUserFromSessionArray = function(username) {
+	for(var index = 0; index < sessionArray.length; index++){
+		if(sessionArray[index] == username){
+			sessionArray.splice(index,index);
+		}
+	}
+};
+
+/*Before a user logs in we check, whether they are already logged in, but from another device*/
+var checkIfUserIsAlreadyLogged = function(username){
+	for(var index = 0; index < sessionArray.length; index++){
+		if(sessionArray[index] == username){
+			return true;
+		}
+	}
+	return false;
+};
 
 app.route('/login')
 	.get(function(req, res) {
@@ -149,48 +178,56 @@ app.route('/login')
 			var username = fields.username;
 			var password = fields.password;
 
-			isValidPassworrd(fields, function(response, username) {
-				if(response){
-					console.log("Successful login!");
-					req.session.user = username;
+			if(checkIfUserIsAlreadyLogged(username)){
+				res.render(__dirname + '/client/views/login.jade', {information: "The user already uses this account!"});
+			}
+			else {
+				isValidPassworrd(fields, function(response, username) {
+					if(response){
+						console.log("Successful login!");
+						req.session.user = username;
 
-					var fileExistence = __dirname + '/client/img/uploads/avatars/' + req.session.user + '.jpg';
-					if (fs.existsSync(fileExistence)) {
-					    req.session.avatar = './img/uploads/avatars/' + req.session.user + '.jpg';
-					}
-
-					var controllerCode = Math.floor((Math.random() * 1000) + 1);
-
-					req.session.controllerCode = controllerCode;
-
-					db.account.find({username: req.session.user}).toArray(function(err, result){
-						if (err){
-							res.send(err);
-						} else if(result.length){
-
-							req.session.forward = result[0].controlButtons.forward;
-							req.session.backward = result[0].controlButtons.backward;
-							req.session.left = result[0].controlButtons.left;
-							req.session.right = result[0].controlButtons.right;
-							req.session.attack = result[0].controlButtons.attack;
-
-							res.render(__dirname + '/client/views/menu.jade', {user: req.session.user,
-								forward:req.session.forward,
-								backward:req.session.backward,
-								left:req.session.left,
-								right:req.session.right,
-								attack:req.session.attack
-							});
-						} else {
-							console.log("No documents found");
-							res.render(__dirname + '/client/views/menu.jade', {user: req.session.user});
+						var fileExistence = __dirname + '/client/img/uploads/avatars/' + req.session.user + '.jpg';
+						if (fs.existsSync(fileExistence)) {
+						    req.session.avatar = './img/uploads/avatars/' + req.session.user + '.jpg';
 						}
-					});
-				}else{
-					res.render(__dirname + '/client/views/login.jade', {information: "Unsuccessful login!"});
-				}
-			});
+
+						// we make sure that all of the usernames that are logged in are saved
+						sessionArray.push(username);
+
+						var controllerCode = Math.floor((Math.random() * 1000) + 1);
+						req.session.controllerCode = controllerCode;
+
+						db.account.find({username: req.session.user}).toArray(function(err, result){
+							if (err){
+								res.send(err);
+							} else if(result.length){
+
+								req.session.forward = result[0].controlButtons.forward;
+								req.session.backward = result[0].controlButtons.backward;
+								req.session.left = result[0].controlButtons.left;
+								req.session.right = result[0].controlButtons.right;
+								req.session.attack = result[0].controlButtons.attack;
+
+								res.render(__dirname + '/client/views/menu.jade', {user: req.session.user,
+									forward:req.session.forward,
+									backward:req.session.backward,
+									left:req.session.left,
+									right:req.session.right,
+									attack:req.session.attack
+								});
+							} else {
+								console.log("No documents found");
+								res.render(__dirname + '/client/views/menu.jade', {user: req.session.user});
+							}
+						});
+					}else{
+						res.render(__dirname + '/client/views/login.jade', {information: "Unsuccessful login!"});
+					}
+				});
+			}
 		});
+
 	});
 
 app.route('/register')
@@ -730,7 +767,9 @@ var DEBUG = true;
 //tries to find a user where the username and password exists
 var isValidPassworrd = function(data, cb){
 //	return cb(true,null);
-	db.account.find({username:data.username,password:data.password}, function(err, res){
+
+	var hash =  sha1(data.password);
+	db.account.find({username:data.username,password:hash}, function(err, res){
 		if(res.length > 0)
 			cb(true, data.username);
 		else
@@ -759,8 +798,8 @@ var addUser = function(data, cb){
 		right: 68,
 		attack: 1
 	};
-
-	db.account.insert({username:data.username,password:data.password,email:data.email, controlButtons:controlButtons}, function(err){
+	var hash = sha1(data.password);
+	db.account.insert({username:data.username, password:hash, email:data.email, controlButtons:controlButtons}, function(err){
 		cb();
 	});
 };

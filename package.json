@@ -15,7 +15,8 @@
     "express-session":"^1.0.6",
     "consolidate":"^0.14.5",
     "jade":"^1.11.0",
-    "mongojs":"^2.4.0"
+    "mongojs":"^2.4.0",
+    "sha1":"^1.1.1"
   },
   "engines": {
     "node": "6.9.x"
