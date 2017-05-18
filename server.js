@@ -151,7 +151,7 @@ app.route('/logout')
 var deleteUserFromSessionArray = function(username) {
 	for(var index = 0; index < sessionArray.length; index++){
 		if(sessionArray[index] == username){
-			sessionArray.splice(index,index);
+			sessionArray.splice(index, 1);
 		}
 	}
 };
@@ -276,7 +276,6 @@ app.route('/options')
 
 //checks if the keyInputCode is an arrow or a moue button, returns a string
 var checkIfArrowKey = function(keyInput){
-	console.log("keyInput: " + keyInput);
 	switch (keyInput) {
 		case "37": // left
 			return "Left Arrow";
@@ -859,13 +858,13 @@ io.sockets.on('connection', function(socket) {
 						curPlayer.pressingAttack = stateValue;
 						break;
 					case "mouseAngle":
-						if(data.state > 0)
-						{
-							curPlayer.mouseAngle = parseFloat(data.state + 90.0);
-						}
-						else{
-							curPlayer.mouseAngle = parseFloat(data.state - 90.0);
-						}
+					//	if(data.state > 0)
+					//	{
+							curPlayer.mouseAngle = parseFloat(data.state);
+						//}
+						//else{
+						//	curPlayer.mouseAngle = parseFloat(data.state - 90.0);
+					//	}
 						break;
 					default:
 						break;

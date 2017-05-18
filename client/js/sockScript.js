@@ -492,6 +492,8 @@ document.addEventListener('keyup', function(event) {
 			dy = my - cy,
 			angle = Math.atan2(dy, dx);
 
+		console.log("DX: " + dx + " DY: " + dy);
+
 		// get new point
 		var x = cx + radius * Math.cos(angle),
 			y = cy + radius * Math.sin(angle);
@@ -504,7 +506,8 @@ document.addEventListener('keyup', function(event) {
 
 		// draw dot on new point
 		//ctx.fillRect(x - 2, y - 2, 8, 8);
-		//console.log("angle: " + angle / Math.PI * 180);
+		console.log("angle11111111111111111111111: " + angle);
+		console.log("angle2222222222222222: " + angle / Math.PI * 180);
 
 		socket.emit('keyPress', {inputId:'mouseAngle', state:angle / Math.PI * 180, x:x, y:y});
 	  }
