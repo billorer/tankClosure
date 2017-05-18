@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>Simple Canvas Game</title>
+
+ 		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+ 		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+		<link href="http://fonts.googleapis.com/css?family=Source+Sans+Pro" rel="stylesheet" type="text/css">
+		<link rel="stylesheet" type="text/css" href="css/game.css">
+	</head>
+	<body>
+		<div id="chooseTankDiv">
+			<div id="left" class="demo-3">
+		        <figure onclick="chosenTank(1);">
+		            <img src="../img/tanks/tank1.png" alt="tank1Image"/>
+		            <figcaption>
+		                <h2>This is a cool title!</h2>
+		                <p>Agile tank!</p>
+		            </figcaption>
+		        	<button onclick="chosenTank(1);">Choose</button>
+		        </figure >
+			</div>
+			<div id="center" class="demo-3">
+
+		        <figure onclick="chosenTank(2);">
+		            <img src="../img/tanks/tank2.png" alt="tank1Image"/>
+		            <figcaption >
+		                <h2>This is a cool title!</h2>
+		                <p>Strong tank</p>
+		            </figcaption>
+		            <button onclick="chosenTank(2);">Choose</button>
+		        </figure>
+
+			</div>
+			<div id="right" class="demo-3">
+		        <figure onclick="chosenTank(3);">
+		            <img src="../img/tanks/tank3.png" alt="tank1Image"/>
+		            <figcaption>
+		                <h2>This is a cool title!</h2>
+			                <p>Cool Tank</p>
+		            </figcaption >
+		            <button onclick="chosenTank(3);">Choose</button>
+		        </figure>
+			</div>
+		</div>
+
+		<div id="gameDiv" style="display: none;">
+			<h4>TankClosure</h4>
+			<button onclick="window.location='/logout'">Logout</button>
+			<canvas id="ctx" width="950" height="700"></canvas>
+
+			<!--<div id="chat-text" style="width:500px;height:500px;overflow-y:scroll;">
+				<div>Hello!</div>
+			</div>
+
+			<form id="chat-form">
+				<input id="chat-input" type="text" style="width:500px;">
+			</form>
+-->
+		</div>
+
+		<script src="https://cdn.socket.io/socket.io-1.4.5.js" type="text/javascript"></script>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+		<script src="js/sockScript.js" type="text/javascript" ></script>
+	</body>
+</html>

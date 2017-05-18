@@ -1,0 +1,64 @@
+doctype html
+html(lang='en')
+  head
+    meta(charset='utf-8')
+    title TankClosure
+    link(rel="stylesheet", href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css", integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u", crossorigin="anonymous")
+    link(rel="stylesheet", href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css", integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp", crossorigin="anonymous")
+    link(rel="stylesheet", href="http://fonts.googleapis.com/css?family=Source+Sans+Pro", type="text/css")
+    link(rel='stylesheet', href='css/options.css', type='text/css')
+    script(src='https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js', type='text/javascript')
+    script(src='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js', integrity='sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa', crossorigin='anonymous')
+    script(src='js/options.js', type='text/javascript')
+  body
+    nav.navbar.navbar-default
+      .container-fluid
+          .navbar-header
+              a.navbar-brand(href='') Brand
+          .collapse.navbar-collapse
+              .dropdown.navbar-right.navbar-text
+                  | Signed in as
+                  a.dropdown-toggle(data-toggle='dropdown', href='#', role='button', aria-haspopup='true', aria-expanded='false')
+                    |  #{user}
+                    span.caret
+                  ul.dropdown-menu
+                    li
+                      a(href='profile') Profile
+                    li
+                      a(href='logout') Logout
+    .container
+     .menu
+      h2 Options
+      h3
+        | #{error}
+      form(onsubmit='return false;')
+        h4
+          | Your code: #{controllerCode}
+      form.form-horizontal(method='post', action='/saveoptions')
+        .form-group
+          label.control-label.col-sm-4(for='forward') Forward:
+          .col-sm-8
+            input#inputForward.form-control(type='text', name='forward', text='#{forwardText}', placeholder='#{forwardText}', value='#{forward}', onkeydown="getKeyCode(event,'Forward')", required)
+        .form-group
+          label.control-label.col-sm-4(for='backward') Backward:
+          .col-sm-8
+            input#inputBackward.form-control(type='text', name='backward', text='#{backwardText}', placeholder='#{backwardText}', value='#{backward}', onkeydown="getKeyCode(event,'Backward')", required)
+        .form-group
+          label.control-label.col-sm-4(for='left') Left:
+          .col-sm-8
+            input#inputLeft.form-control(type='text', name='left', text='#{leftText}', placeholder='#{leftText}', value='#{left}', onkeydown="getKeyCode(event,'Left')", required)
+        .form-group
+          label.control-label.col-sm-4(for='right') Right:
+          .col-sm-8
+            input#inputRight.form-control(type='text', name='right', text='#{rightText}', placeholder='#{rightText}', value='#{right}', onkeydown="getKeyCode(event,'Right')", required)
+        .form-group
+          label.control-label.col-sm-4(for='attack') Attack:
+          .col-sm-8
+            input#inputAttack.form-control.popupProfile(type='text', name='attack', text='#{attackText}', placeholder='#{attackText}', value='#{attack}', onkeydown="getKeyCode(event,'Attack')", onmousedown="getMouseCode(event,'Attack')", required)
+            label#helpMessage.col-sm-2 The left mouse button can be used only as attack!
+        .form-group
+          .col-sm-offset-0.col-sm-12
+            button.btn.btn-default.button(type='submit', onclick="beforeSubmit()") Save
+        ul.formlink
+          li
+            a(href='menu', tabindex='4') Back

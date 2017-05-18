@@ -1,0 +1,64 @@
+doctype html
+html(lang='en')
+  head
+    meta(charset='utf-8')
+    title TankClosure
+    link(rel="stylesheet", href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css", integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u", crossorigin="anonymous")
+    link(rel="stylesheet", href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css", integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp", crossorigin="anonymous")
+    link(rel="stylesheet", href="http://fonts.googleapis.com/css?family=Source+Sans+Pro", type="text/css")
+    link(rel='stylesheet', href='css/options.css', type='text/css')
+    script(src='https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js', type='text/javascript')
+    script(src='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js', integrity='sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa', crossorigin='anonymous')
+    script(src='js/help.js', type='text/javascript')
+  body
+    nav.navbar.navbar-default
+      .container-fluid
+          .navbar-header
+              a.navbar-brand(href='') Brand
+          .collapse.navbar-collapse
+              .dropdown.navbar-right.navbar-text
+                  | Signed in as
+                  a.dropdown-toggle(data-toggle='dropdown', href='#', role='button', aria-haspopup='true', aria-expanded='false')
+                    |  #{user}
+                    span.caret
+                  ul.dropdown-menu
+                    li
+                      a(href='profile') Profile
+                    li
+                      a(href='logout') Logout
+    .container
+        .menu
+            .row
+                .col-lg-5
+                    .media
+                        if successfulUpload
+                            h3
+                                | Successful file upload!
+                        a.pull-left(onclick="openUploadForm()", href='#')
+                            if avatar
+                                img.media-object.dp.img-circle(src='#{avatar}', style='width: 100px;height:100px;')
+                            else
+                                img.media-object.dp.img-circle(src='./img/uploads/avatars/default_avatar.png', style='width: 100px;height:100px;')
+                            form(id="uploadForm", action='fileupload', method='post', enctype='multipart/form-data', style="display: none;")
+                                label
+                                    | Only jpg allowed
+                                br
+                                label.btn.btn-default.button
+                                    | Browse
+                                    input(type='file', name='filetoupload', style="display:none", required)
+                                br
+                                button.btn.btn-default.button(type='submit') Upload
+                        .media-body
+                            h4.media-heading
+                                | Username: #{user}
+            ul.formlink
+                li
+                    a(href='menu', tabindex='4') Back
+            // h5
+             //  | Software Developer at
+              // a(href='http://gridle.in') Gridle.in
+             //hr(style='margin:8px auto')
+             //span.label.label-default HTML5/CSS3
+             //span.label.label-default jQuery
+             //span.label.label-info CakePHP
+             //span.label.label-default Android

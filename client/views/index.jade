@@ -1,0 +1,66 @@
+doctype html
+html(lang='en')
+  head
+    meta(charset='utf-8')
+    title TankClosure
+    link(rel='stylesheet', href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css', integrity='sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u', crossorigin='anonymous')
+    link(rel='stylesheet', href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css', integrity='sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp', crossorigin='anonymous')
+    link(href='http://fonts.googleapis.com/css?family=Source+Sans+Pro', rel='stylesheet', type='text/css')
+    link(rel='stylesheet', type='text/css', href='css/game.css')
+
+    script(src='https://cdn.socket.io/socket.io-1.4.5.js', type='text/javascript')
+    script(src='https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js', type='text/javascript')
+    script(src='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js', integrity='sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa', crossorigin='anonymous')
+    script(src='js/help.js', type='text/javascript')
+  body
+    nav.navbar.navbar-default
+        .container-fluid
+            .navbar-header
+                a.navbar-brand(href='') Brand
+            .collapse.navbar-collapse
+                .dropdown.navbar-right.navbar-text
+                    | Signed in as
+                    a#username.dropdown-toggle(data-toggle='dropdown', href='#', role='button', aria-haspopup='true', aria-expanded='false')
+                      |  #{user}
+                      span.caret
+                    ul.dropdown-menu
+                      li
+                        a.popupProfile(href='profile') Profile
+                            span.tooltiptext The game session will be left!
+                      li
+                        a(href='logout') Logout
+    .container
+        #chooseTankDiv.menu
+         .row
+          .demo-3.col-md-4
+            figure(onclick='chosenTank(1, #{controllerCode}, #{controlButtons});')
+              img.img-responsive(src='../img/tanks/tank1.png', alt='tank1Image')
+              figcaption
+                h2 This is a cool title!
+                p Has a great health and damage rate!
+              button.btn.btn-default(onclick='chosenTank(1, #{controllerCode}, #{controlButtons});') Choose
+          .demo-3.col-md-4
+            figure(onclick='chosenTank(2, #{controllerCode}, #{controlButtons});')
+              img.img-responsive(src='../img/tanks/tank2.png', alt='tank1Image')
+              figcaption
+                h2 This is a cool title!
+                p It is a very fast and mobile tank, but it's damage lacks!
+              button.btn.btn-default(onclick='chosenTank(2, #{controllerCode}, #{controlButtons});') Choose
+          .demo-3.col-md-4
+            figure(onclick='chosenTank(3, #{controllerCode}, #{controlButtons});')
+              img.img-responsive(src='../img/tanks/tank3.png', alt='tank1Image')
+              figcaption
+                h2 Red Wine!
+                p Slow one, has a middle health, but its damage it's the highest!
+              button.btn.btn-default(onclick='chosenTank(3, #{controllerCode},  #{controlButtons});') Choose
+         ul.formlink
+          li
+           a(href='menu', tabindex='4') Back
+    #gameDiv(style='display: none;')
+        .col-lg-9
+          canvas#ctx(width='1050', height='750')
+        .col-lg-3
+            #chat-text
+            form#chat-form
+                  input#chat-input(type='text')
+  script(src='js/sockScript.js', type='text/javascript')
