@@ -100,8 +100,9 @@
 		var minutes = date.getMinutes();
 		var hour = date.getHours();
 
-		console.log("DATE: " + seconds);
 		chatText.innerHTML += '<div>' + "<" + hour + ":" + minutes + ":" + seconds + ">" + data.username + ": " + data.message + '</div>';
+		//this makes sure when the new message arrives, the user should not scroll to see it
+   		chatText.scrollTop = chatText.scrollHeight;
 	});
 
 	chatForm.onsubmit = function(e){
