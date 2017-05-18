@@ -883,19 +883,19 @@ io.sockets.on('connection', function(socket) {
 	socket.on('sendMsgToServer', function(data){
 		var playerName = ("" + socket.id).slice(2,7);
 		for(var i in SOCKET_LIST){
-			SOCKET_LIST[i].emit('addToChat', ': ' + data); //playerName + ': ' + data);
+			SOCKET_LIST[i].emit('addToChat', {"message":data.message, "username":data.username}); //playerName + ': ' + data);
 		}
 	});
 
 	//ez VESZELYES egyelore nincs lekezelve, ha a kliens egy rossz uzenetet kulde a server halott lehet
 	//pl. Player.list = null;
-	socket.on('evalServer', function(data){
-		if(!DEBUG)
-			return;
-
-		var res = eval(data);
-		socket.emit('evalAnswer', res);
-	});
+	// socket.on('evalServer', function(data){
+	// 	if(!DEBUG)
+	// 		return;
+	//
+	// 	var res = eval(data);
+	// 	socket.emit('evalAnswer', res);
+	// });
 
 	socket.on('reset', function(data){
 		for(var i in Player.list){

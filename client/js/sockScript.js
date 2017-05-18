@@ -90,18 +90,30 @@
 	});
 
 	socket.on('addToChat', function(data){
-		var username = document.getElementById('username').innerText;
+		//var username = document.getElementById('username').innerText;
 		// username = username.slice(0, -1);
-		chatText.innerHTML += '<div>' + username + " " + data + '</div>';
+
+		var date = new Date;
+		date.setTime(new Date().getTime());
+
+		var seconds = date.getSeconds();
+		var minutes = date.getMinutes();
+		var hour = date.getHours();
+
+		console.log("DATE: " + seconds);
+		chatText.innerHTML += '<div>' + "<" + hour + ":" + minutes + ":" + seconds + ">" + data.username + ": " + data.message + '</div>';
 	});
 
 	chatForm.onsubmit = function(e){
 		e.preventDefault(); //if we submit without this, the page would be refreshed
 
+		//We take the username from the navbar
+		var username = document.getElementById('username').innerText;
+
 		if(chatInput.value[0] === '/')
 			socket.emit('evalServer', chatInput.value.slice(1));
 		else
-			socket.emit('sendMsgToServer', chatInput.value);
+			socket.emit('sendMsgToServer', {"message":chatInput.value, "username":username});
 		chatInput.value = '';
 	};
 
