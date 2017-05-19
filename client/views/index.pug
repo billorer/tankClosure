@@ -33,26 +33,26 @@ html(lang='en')
         #chooseTankDiv.menu
          .row
           .demo-3.col-md-4
-            figure(onclick='chosenTank(1, #{controllerCode}, #{controlButtons});')
+            figure(onclick="chosenTank(1, '" + controllerParameters + "');")
               img.img-responsive(src='../img/tanks/tank1.png', alt='tank1Image')
               figcaption
                 h2 This is a cool title!
                 p Has a great health and damage rate!
-              button.btn.btn-default(onclick='chosenTank(1, #{controllerCode}, #{controlButtons});') Choose
+              button.btn.btn-default(onclick="chosenTank(1, '" + controllerParameters + "');") Choose
           .demo-3.col-md-4
-            figure(onclick='chosenTank(2, #{controllerCode}, #{controlButtons});')
+            figure(onclick="chosenTank(2, '" + controllerParameters + "');")
               img.img-responsive(src='../img/tanks/tank2.png', alt='tank1Image')
               figcaption
                 h2 This is a cool title!
                 p It is a very fast and mobile tank, but it's damage lacks!
-              button.btn.btn-default(onclick='chosenTank(2, #{controllerCode}, #{controlButtons});') Choose
+              button.btn.btn-default(onclick="chosenTank(2, '" + controllerParameters + "');") Choose
           .demo-3.col-md-4
-            figure(onclick='chosenTank(3, #{controllerCode}, #{controlButtons});')
+            figure(onclick="chosenTank(3, '" + controllerParameters + "');")
               img.img-responsive(src='../img/tanks/tank3.png', alt='tank1Image')
               figcaption
                 h2 Red Wine!
                 p Slow one, has a middle health, but its damage it's the highest!
-              button.btn.btn-default(onclick='chosenTank(3, #{controllerCode},  #{controlButtons});') Choose
+              button.btn.btn-default(onclick="chosenTank(3, '" + controllerParameters + "');") Choose
          ul.formlink
           li
            a(href='menu', tabindex='4') Back

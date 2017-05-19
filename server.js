@@ -1,378 +1,30 @@
-var mongojs = require("mongojs");
-var db = mongojs('mongodb://root:root@ds143151.mlab.com:43151/tankclosure', ['account']); //mongojs('localhost:27017/myGame', ['account','progress']);
-var assert = require('assert');
-
 var path = require('path');
 var http = require('http');
 var express = require('express');
-var formidable = require('formidable');
 var session = require('express-session');
 
-var sha1 = require('sha1');
-
-var fs = require('fs');
-var mv = require('mv');
-//EMAILS
-const nodemailer = require('nodemailer');
-const xoauth2 = require('xoauth2');
-
-var sendEmail = function(data){
-	var transporter = nodemailer.createTransport({
-	    service: 'gmail',
-	    auth: {
-	        //xoauth2: xoauth2.createXOAuth2Generator({
-	        	type: 'OAuth2',
-	            user: 'zoran@suto.ro',
-	            clientId: '75594978998-q29vd6ancdngukru4j25fj1rnnd9clrv.apps.googleusercontent.com',
-	            clientSecret: 'CevhJSTLE5JpMdeRVO-GG7gz',
-	            refreshToken: '1/Ubz5p5Rqn_l4TQbLbfTExjF3VawGqeWGyKC71kkEwQ0DYJMOts67IGcDD1hjO72b',
-	            accessToken: 'ya29.GlsrBESwOfIpuyolYIqcI8PBM_Z6XlXS0p1-5mA7Yf8gZ0lrw_uBwf-cUQyc5elVg1mgX4xXwNPnpkbEm61DwavGBaTobd6kNisE-Sq9zD7CM0466Gu6uKt7_SXP',
-	    //    })
-	    },
-	});
-
-	var mailOptions = {
-	    from: 'closureTank <zoran@suto.ro>',
-	    to: data.email,
-	    subject: 'Successful registration!',
-	    text: 'Thank you for registration! \n\nYour username: ' + data.username + ' \nYour password: ' + data.password
-	};
-
-	transporter.sendMail(mailOptions, function (err, res) {
-	    if(err){
-	        console.log('Error');
-	    } else {
-	        console.log('Email Sent');
-	    }
-	});
-
-};
-
-var cons = require('consolidate');
-
 var app = express();
+app.set('views', path.join(__dirname, 'client/views'));
+app.set("view engine", "pug");
 
-app.engine('html', cons.swig);
-app.set("view engine", "jade");
+//starts the server
+var server = http.createServer(app);
 
 var sessionMiddleware = session({
   secret: 'keyboard cat',
   resave: false,
   saveUninitialized: true
 });
-
-var sessionArray = [];
-
 app.use(sessionMiddleware);
-
-//starts the server
-var server = http.createServer(app);
-
 app.use(express.static(path.join(__dirname, 'client')));
 
-//routes
-app.get('/', function(req, res) {
-	if(!req.session.user){
-		//res.sendFile(__dirname + '/client/views/login.html');
-		res.render(__dirname + '/client/views/login.jade');
-	}
-	else
-		res.render(__dirname + '/client/views/menu.jade', {user: req.session.user});
-});
+var routes = require('./routes/routes');
+app.use('/', routes);
 
-app.get('/menu', function(req, res){
-	if(req.session.user){
-		res.render(__dirname + '/client/views/menu.jade', {user: req.session.user});
-	}
-});
-
-app.get('/profile', function(req, res){
-	if(req.session.user){
-		res.render(__dirname + '/client/views/profile.jade', {user: req.session.user, avatar: req.session.avatar});
-	}
-});
-
-app.post('/fileupload', function(req, res){
-	if(req.session.user){
-	  	var form = new formidable.IncomingForm();
-	  	form.parse(req, function (err, fields, files) {
-			var oldpath = files.filetoupload.path;
-
-			var str = files.filetoupload.name;
-
-			var tok = str.split(".");
-			//only jpg allowed
-			if(tok[1] == 'jpg'){
-				var newpath = __dirname + '/client/img/uploads/avatars/' + req.session.user + '.jpg';
-				req.session.avatar = './img/uploads/avatars/' + req.session.user + '.jpg';
-				mv(oldpath, newpath, function(err){
-					if (err) throw err;
-					res.render(__dirname + '/client/views/profile.jade', {user: req.session.user, successfulUpload: true, avatar: req.session.avatar});
-				});
-			}
-		});
-	}
-});
-
-app.get('/play', function(req, res){
-	if(req.session.user){
-
-		var controllerButtons = {
-			forward: req.session.forward,
-			backward: req.session.backward,
-			left: req.session.left,
-			right: req.session.right,
-			attack: req.session.attack
-		};
-
-		res.render(__dirname + '/client/views/index.jade', {user: req.session.user, controllerCode: req.session.controllerCode, controlButtons:  JSON.stringify(controllerButtons)});
-	}else{
-		res.render(__dirname + '/client/views/login.jade');
-	}
-});
-
-app.route('/logout')
-    .get( function( req, res ){
-
-		deleteUserFromSessionArray(req.session.user);
-
-        req.session.destroy(function(err){
-            if(err){
-                console.log(err);
-            }
-            else
-            {
-                res.render(__dirname + '/client/views/login.jade'); //kijelentkeztunk
-            }
-        });
-    });
-
-/*After a user logs out, its username should be removed from the sessionArray*/
-var deleteUserFromSessionArray = function(username) {
-	for(var index = 0; index < sessionArray.length; index++){
-		if(sessionArray[index] == username){
-			sessionArray.splice(index, 1);
-		}
-	}
-};
-
-/*Before a user logs in we check, whether they are already logged in, but from another device*/
-var checkIfUserIsAlreadyLogged = function(username){
-	for(var index = 0; index < sessionArray.length; index++){
-		if(sessionArray[index] == username){
-			return true;
-		}
-	}
-	return false;
-};
-
-app.route('/login')
-	.get(function(req, res) {
-		//res.sendFile(__dirname + '/client/views/login.html');
-		res.render(__dirname + '/client/views/login.jade');
-	})
-	.post (function(req, res) {
-		var form = new formidable.IncomingForm();
-		form.parse(req, function(err, fields, files){
-
-			var username = fields.username;
-			var password = fields.password;
-
-			if(checkIfUserIsAlreadyLogged(username)){
-				res.render(__dirname + '/client/views/login.jade', {information: "The user already uses this account!"});
-			}
-			else {
-				isValidPassworrd(fields, function(response, username) {
-					if(response){
-						console.log("Successful login!");
-						req.session.user = username;
-
-						var fileExistence = __dirname + '/client/img/uploads/avatars/' + req.session.user + '.jpg';
-						if (fs.existsSync(fileExistence)) {
-						    req.session.avatar = './img/uploads/avatars/' + req.session.user + '.jpg';
-						}
-
-						// we make sure that all of the usernames that are logged in are saved
-						sessionArray.push(username);
-
-						var controllerCode = Math.floor((Math.random() * 1000) + 1);
-						req.session.controllerCode = controllerCode;
-
-						db.account.find({username: req.session.user}).toArray(function(err, result){
-							if (err){
-								res.send(err);
-							} else if(result.length){
-
-								req.session.forward = result[0].controlButtons.forward;
-								req.session.backward = result[0].controlButtons.backward;
-								req.session.left = result[0].controlButtons.left;
-								req.session.right = result[0].controlButtons.right;
-								req.session.attack = result[0].controlButtons.attack;
-
-								res.render(__dirname + '/client/views/menu.jade', {user: req.session.user,
-									forward:req.session.forward,
-									backward:req.session.backward,
-									left:req.session.left,
-									right:req.session.right,
-									attack:req.session.attack
-								});
-							} else {
-								console.log("No documents found");
-								res.render(__dirname + '/client/views/menu.jade', {user: req.session.user});
-							}
-						});
-					}else{
-						res.render(__dirname + '/client/views/login.jade', {information: "Unsuccessful login!"});
-					}
-				});
-			}
-		});
-
-	});
-
-app.route('/register')
-	.get(function(req, res) {
-		//res.sendFile(__dirname + '/client/views/register.html');
-		res.render(__dirname + '/client/views/register.jade');
-	})
-	.post(function(req, res) {
-		var form = new formidable.IncomingForm();
-		form.parse(req, function(err, fields, files){
-
-			var username = fields.username;
-			var password = fields.password;
-			var email = fields.email;
-
-			isUsernameTaken(username, function(response){
-				if(response){
-					console.log("Username already taken!");
-					//res.redirect('/register');
-					res.render(__dirname + '/client/views/register.jade', {information: "Username already taken!"});
-				}else{
-					addUser(fields, function(){
-						console.log("Successful registration!");
-
-						sendEmail(fields);
-
-						//res.redirect('/login');
-						res.render(__dirname + '/client/views/login.jade', {information: "Successful registration!"});
-					});
-				}
-			});
-		});
-	});
-
-app.route('/options')
-	.get(function(req, res) {
-		if(req.session.user){
-			res.render(__dirname + '/client/views/options.jade', {controllerCode: req.session.controllerCode, user: req.session.user,
-				forward:  checkIfArrowKey(req.session.forward), backward:  checkIfArrowKey(req.session.backward), left:  checkIfArrowKey(req.session.left),
-				right:  checkIfArrowKey(req.session.right), attack:  checkIfArrowKey(req.session.attack),
-				forwardText:  Number(req.session.forward), backwardText:  req.session.backward, leftText:  req.session.left,
-				rightText: req.session.right, attackText:  req.session.attack
-			});
-		}
-	});
-
-//checks if the keyInputCode is an arrow or a moue button, returns a string
-var checkIfArrowKey = function(keyInput){
-	switch (keyInput) {
-		case "37": // left
-			return "Left Arrow";
-		case "38": // up
-			return "Up Arrow";
-		case "39": // right
-			return "Right Arrow";
-		case "40": // down
-			return "Down Arrow";
-		case "1":
-			return "Left Mouse Button";
-		default:
-			return String.fromCharCode(keyInput);
-	}
-};
-
-//checks if the user has given a buttont wice for different functionalities
-var checkUniqueButton = function(fields){
-	for (var property1 in fields) {
-		if (fields.hasOwnProperty(property1)) {
-			for (var property2 in fields) {
-				if (fields.hasOwnProperty(property2)) {
-					if(fields[property1] == fields[property2] && property1 != property2){
-						return true;
-					}
-				}
-			}
-		}
-	}
-	return false;
-};
-
-app.route('/saveoptions')
-	.post(function(req, res){
-		if(req.session.user){
-			var form = new formidable.IncomingForm();
-			form.parse(req, function(err, fields, files){
-
-				if(checkUniqueButton(fields)){
-					res.render(__dirname + '/client/views/options.jade', {user: req.session.user, error: "The buttons should be unique!"});
-				}
-
-
-					var forward = fields.forward;
-					var backward = fields.backward;
-					var left = fields.left;
-					var right = fields.right;
-					var attack = fields.attack;
-
-					var controlButtons = {
-						forward: forward,
-						backward: backward,
-						left: left,
-						right: right,
-						attack: attack
-					};
-
-					req.session.forward = forward;
-					req.session.backward = backward;
-					req.session.left = left;
-					req.session.right = right;
-					req.session.attack = attack;
-
-					db.account.update({username:req.session.user}, {$set:{controlButtons:controlButtons}});
-
-					res.render(__dirname + '/client/views/menu.jade', {user: req.session.user});
-				//}else{
-					//res.render(__dirname + '/client/views/options.jade', {user: req.session.user, error: "The buttons must be one character!"});
-				//}
-			});
-		}
-	});
-
-// var isLetterOrArrow = function(str) {
-//
-// 	switch (str) {
-// 		case "Left Arrow":
-// 			return true;
-// 		case "Right Arrow":
-// 			return true;
-// 		case "Up Arrow":
-// 			return true;
-// 		case "Down Arrow":
-// 			return true;
-// 		default:
-// 			break;
-// 	}
-//
-//  	return str.length === 1 && str.match(/[a-z]/i);
-// };
-
-server.listen(process.env.PORT || 2000); //2000);
+server.listen(process.env.PORT || 2000);
 console.log("Server has been started!");
 
 var SOCKET_LIST = {};
-
-//var gameOver = false;
 
 var Entity = function(){
 	var self = {
@@ -763,46 +415,6 @@ Bullet.getAllInitPack = function(){
 
 var DEBUG = true;
 
-//tries to find a user where the username and password exists
-var isValidPassworrd = function(data, cb){
-//	return cb(true,null);
-
-	var hash =  sha1(data.password);
-	db.account.find({username:data.username,password:hash}, function(err, res){
-		if(res.length > 0)
-			cb(true, data.username);
-		else
-			cb(false, data.username);
-	});
-};
-
-//gets a username and checks if it exists
-var isUsernameTaken = function(data, cb){
-	//return cb(false);
-	db.account.find({username:data}, function(err, res){
-		if(res.length > 0)
-			cb(true);
-		else
-			cb(false);
-	});
-};
-
-var addUser = function(data, cb){
-
-//	return cb();
-	var controlButtons = {
-		forward: 87,
-		backward: 83,
-		left: 65,
-		right: 68,
-		attack: 1
-	};
-	var hash = sha1(data.password);
-	db.account.insert({username:data.username, password:hash, email:data.email, controlButtons:controlButtons}, function(err){
-		cb();
-	});
-};
-
 var io = require('socket.io')(server, {});
 io.sockets.on('connection', function(socket) {
 	socket.id = Math.random();
@@ -858,13 +470,7 @@ io.sockets.on('connection', function(socket) {
 						curPlayer.pressingAttack = stateValue;
 						break;
 					case "mouseAngle":
-					//	if(data.state > 0)
-					//	{
-							curPlayer.mouseAngle = parseFloat(data.state);
-						//}
-						//else{
-						//	curPlayer.mouseAngle = parseFloat(data.state - 90.0);
-					//	}
+						curPlayer.mouseAngle = parseFloat(data.state);
 						break;
 					default:
 						break;
@@ -908,7 +514,6 @@ io.sockets.on('connection', function(socket) {
 				}while(checkIfGoodRespawn(p));
 			}
 		}
-
 	});
 });
 
@@ -924,7 +529,7 @@ var checkIfGoodRespawn = function(player){
 var initPack = {player:[], bullet:[]};
 var removePack = {player:[], bullet:[]};
 
-//25 fram per second
+//25 frame per second
 setInterval(function(){
 	var pack = {
 		player:Player.update(),

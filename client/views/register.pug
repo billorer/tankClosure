@@ -1,0 +1,36 @@
+doctype html
+html(lang='en')
+  head
+    meta(charset='utf-8')
+    title TankClosure
+    link(rel="stylesheet", href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css", integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u", crossorigin="anonymous")
+    link(rel="stylesheet", href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css", integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp", crossorigin="anonymous")
+    link(rel="stylesheet", href="http://fonts.googleapis.com/css?family=Source+Sans+Pro", type="text/css")
+    link(rel='stylesheet', href='css/options.css', type='text/css')
+    script(src='https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js', type='text/javascript')
+    script(src='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js', integrity='sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa', crossorigin='anonymous')
+body
+    .container
+        .menu
+          h1 Register
+          h3
+              | #{information}
+          form.form-horizontal(method='post', action='/register')
+            .form-group
+              label.control-label.col-sm-4(for='username') Username:
+              .col-sm-8
+                input.form-control(type='text', name='username', placeholder='Enter username', required)
+            .form-group
+              label.control-label.col-sm-4(for='email') Email:
+              .col-sm-8
+                input.form-control(type='email', name='email', placeholder='Enter email address', required)
+            .form-group
+              label.control-label.col-sm-4(for='password') Password:
+              .col-sm-8
+                input.form-control(type='password', name='password', placeholder='Enter password', required)
+            .form-group
+              .col-sm-offset-0.col-sm-12
+                button.btn.btn-default.button(type='submit') Register
+            ul.formlink
+              li
+                a(href='login', tabindex='4') Login!

@@ -6,7 +6,6 @@
   "dependencies": {
     "express": "^4.13.4",
     "socket.io": "^1.4.5",
-    "assert": "^1.4.1",
     "fs":"^0.0.1-security",
     "mv":"^2.1.1",
     "nodemailer":"^4.0.0",
@@ -14,7 +13,7 @@
     "formidable":"^1.1.1",
     "express-session":"^1.0.6",
     "consolidate":"^0.14.5",
-    "jade":"^1.11.0",
+    "pug":"^2.0.0-rc.1",
     "mongojs":"^2.4.0",
     "sha1":"^1.1.1"
   },
