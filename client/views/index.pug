@@ -16,7 +16,7 @@ html(lang='en')
     nav.navbar.navbar-default
         .container-fluid
             .navbar-header
-                a.navbar-brand(href='') Brand
+                a.navbar-brand(href='') TankClosure
             .collapse.navbar-collapse
                 .dropdown.navbar-right.navbar-text
                     | Signed in as
@@ -36,14 +36,14 @@ html(lang='en')
             figure(onclick="chosenTank(1, '" + controllerParameters + "');")
               img.img-responsive(src='../img/tanks/tank1.png', alt='tank1Image')
               figcaption
-                h2 This is a cool title!
+                h2 Green Grass!
                 p Has a great health and damage rate!
               button.btn.btn-default(onclick="chosenTank(1, '" + controllerParameters + "');") Choose
           .demo-3.col-md-4
             figure(onclick="chosenTank(2, '" + controllerParameters + "');")
               img.img-responsive(src='../img/tanks/tank2.png', alt='tank1Image')
               figcaption
-                h2 This is a cool title!
+                h2 Blue Sky!
                 p It is a very fast and mobile tank, but it's damage lacks!
               button.btn.btn-default(onclick="chosenTank(2, '" + controllerParameters + "');") Choose
           .demo-3.col-md-4
